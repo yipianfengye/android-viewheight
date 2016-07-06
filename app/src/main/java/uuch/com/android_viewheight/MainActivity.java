@@ -1,6 +1,8 @@
 package uuch.com.android_viewheight;
 
 import android.annotation.TargetApi;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
 
         // initOnLayoutListener();
 
+        // initViewHandler();
+
+        // mHandler.sendEmptyMessage(101);
+
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,15 +53,41 @@ public class MainActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            int widht = titleText.getWidth();
+            int width = titleText.getWidth();
             int height = titleText.getHeight();
-            Log.i(TAG, "onWindowFocusChanged width:" + widht + "   "
+            Log.i(TAG, "onWindowFocusChanged width:" + width + "   "
                             + "  height:" + height);
         }
     }
 
+    private Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 101) {
+                int width = titleText.getWidth();
+                int height = titleText.getHeight();
+
+                Log.i(TAG, "initViewHandler height:" + height + "  width:" + width);
+            }
+        }
+    };
+
+    private void initViewHandler() {
+        titleText.post(new Runnable() {
+            @Override
+            public void run() {
+                int width = titleText.getWidth();
+                int height = titleText.getHeight();
+
+                Log.i(TAG, "initViewHandler height:" + height + "  width:" + width);
+            }
+        });
+    }
+
     private void initOnLayoutListener() {
         final ViewTreeObserver viewTreeObserver = this.getWindow().getDecorView().getViewTreeObserver();
+
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -64,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
                 int width = titleText.getMeasuredWidth();
 
                 Log.i(TAG, "height:" + height + "   width:" + width);
+                // 移除OnGlobalLayoutListener事件监听
+                MainActivity.this.getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
     }
@@ -81,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
                 int width = titleText.getMeasuredWidth();
 
                 Log.i(TAG, "height:" + height + "   width:" + width);
+                // 移除OnPreDrawListener事件监听
+                MainActivity.this.getWindow().getDecorView().getViewTreeObserver().removeOnPreDrawListener(this);
                 return true;
             }
         });
